@@ -41,12 +41,15 @@ func FromServices(services []*v1.Service) []v1.EnvVar {
 			continue
 		}
 
+		// TODO: (ningfd) delete service host and service port env in all port
 		// Host
 		name := makeEnvVariableName(service.Name) + "_SERVICE_HOST"
 		result = append(result, v1.EnvVar{Name: name, Value: service.Spec.ClusterIP})
 		// First port - give it the backwards-compatible name
 		name = makeEnvVariableName(service.Name) + "_SERVICE_PORT"
 		result = append(result, v1.EnvVar{Name: name, Value: strconv.Itoa(int(service.Spec.Ports[0].Port))})
+		// TODO: (ningfd) delete service host and service port env in all port
+
 		// All named ports (only the first may be unnamed, checked in validation)
 		for i := range service.Spec.Ports {
 			sp := &service.Spec.Ports[i]
