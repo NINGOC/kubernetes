@@ -23,7 +23,6 @@ import (
 	"strings"
 
 	"k8s.io/api/core/v1"
-	v1helper "k8s.io/kubernetes/pkg/apis/core/v1/helper"
 )
 
 // FromServices builds environment variables that a container is started with,
@@ -31,36 +30,36 @@ import (
 // provided as an argument.
 func FromServices(services []*v1.Service) []v1.EnvVar {
 	var result []v1.EnvVar
-	for i := range services {
-		service := services[i]
 
-		// ignore services where ClusterIP is "None" or empty
-		// the services passed to this method should be pre-filtered
-		// only services that have the cluster IP set should be included here
-		if !v1helper.IsServiceIPSet(service) {
-			continue
-		}
-
-		// TODO: (ningfd) delete service host and service port env in all pod
-		// Host
-		//name := makeEnvVariableName(service.Name) + "_SERVICE_HOST"
-		//result = append(result, v1.EnvVar{Name: name, Value: service.Spec.ClusterIP})
-		// First port - give it the backwards-compatible name
-		//name = makeEnvVariableName(service.Name) + "_SERVICE_PORT"
-		//result = append(result, v1.EnvVar{Name: name, Value: strconv.Itoa(int(service.Spec.Ports[0].Port))})
-		// TODO: (ningfd) delete service host and service port env in all pod
-
-		// All named ports (only the first may be unnamed, checked in validation)
-		for i := range service.Spec.Ports {
-			sp := &service.Spec.Ports[i]
-			if sp.Name != "" {
-				pn := name + "_" + makeEnvVariableName(sp.Name)
-				result = append(result, v1.EnvVar{Name: pn, Value: strconv.Itoa(int(sp.Port))})
-			}
-		}
-		// Docker-compatible vars.
-		result = append(result, makeLinkVariables(service)...)
-	}
+	//// (ningfd) delete service host and service port env in all pod
+	//for i := range services {
+	//	service := services[i]
+	//
+	//	// ignore services where ClusterIP is "None" or empty
+	//	// the services passed to this method should be pre-filtered
+	//	// only services that have the cluster IP set should be included here
+	//	if !v1helper.IsServiceIPSet(service) {
+	//		continue
+	//	}
+	//
+	//	// Host
+	//	name := makeEnvVariableName(service.Name) + "_SERVICE_HOST"
+	//	result = append(result, v1.EnvVar{Name: name, Value: service.Spec.ClusterIP})
+	//	// First port - give it the backwards-compatible name
+	//	name = makeEnvVariableName(service.Name) + "_SERVICE_PORT"
+	//	result = append(result, v1.EnvVar{Name: name, Value: strconv.Itoa(int(service.Spec.Ports[0].Port))})
+	//
+	//	// All named ports (only the first may be unnamed, checked in validation)
+	//	for i := range service.Spec.Ports {
+	//		sp := &service.Spec.Ports[i]
+	//		if sp.Name != "" {
+	//			pn := name + "_" + makeEnvVariableName(sp.Name)
+	//			result = append(result, v1.EnvVar{Name: pn, Value: strconv.Itoa(int(sp.Port))})
+	//		}
+	//	}
+	//	// Docker-compatible vars.
+	//	result = append(result, makeLinkVariables(service)...)
+	//}
 	return result
 }
 
